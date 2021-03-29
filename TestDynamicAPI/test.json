@@ -1,0 +1,111 @@
+﻿{
+  "Time": "23/03/2021",
+  "Method": "Blackbox",
+  "Member": "10",
+  "AllVuln": [
+    {
+      "stt": "1",
+      "riskvuln": "High",
+      "name": "Test VUln"
+    },
+    {
+      "stt": "2",
+      "riskvuln": "Medium",
+      "name": "Test VUln Medium"
+    }
+  ],
+  "AreaAction": [
+    {
+      "Id": "1",
+      "Application": "BBBAS",
+      "Target": "https://google.com",
+      "Platform": "Web"
+    },
+    {
+      "Id": "2",
+      "Application": "CDE",
+      "Target": "https://summer.com",
+      "Platform": "Mobile app"
+    },
+    {
+      "Id": "3",
+      "Application": "SSS",
+      "Target": "https://com.com",
+      "Platform": "Mobile app"
+    }
+  ],
+  "Vuln": [
+    {
+      "NameVuln": "Name Vuln 1",
+      "Risk_Vuln": "High",
+      "CVE": "2017",
+      "Description_Vuln": "Test Description",
+      "Suggest_Vuln": "Test Suggest",
+      "Reference_Vuln": "Tham chiếu",
+      "Name_Function": [
+        {
+          "name_func": "func 1",
+          "add_func": "http://github.com"
+        },
+        {
+          "name_func": "func 1.1",
+          "add_func": "http://google.com"
+        }
+      ],
+      "Request": "",
+      "Response": "",
+      "Image_Vuln": null
+    },
+    {
+      "NameVuln": "Name Vuln 2",
+      "Risk_Vuln": "High",
+      "CVE": "2015",
+      "Description_Vuln": "Test Description",
+      "Suggest_Vuln": "Test Suggest",
+      "Reference_Vuln": "Tham chiếu",
+      "Name_Function": [
+        {
+          "name_func": "func 2",
+          "add_func": "http://github.com"
+        }
+      ],
+      "Request": "",
+      "Response": "",
+      "Image_Vuln": null
+    },
+    {
+      "NameVuln": "Name Vuln 3",
+      "Risk_Vuln": "Medium",
+      "CVE": "2017",
+      "Description_Vuln": "Test Description",
+      "Suggest_Vuln": "Test Suggest",
+      "Reference_Vuln": "Tham chiếu",
+      "Name_Function": [
+        {
+          "name_func": "func 3",
+          "add_func": "http://github.com"
+        }
+      ],
+      "Request": "",
+      "Response": "",
+      "Image_Vuln": null
+    },
+    {
+      "NameVuln": "Name Vuln 4",
+      "Risk_Vuln": "Low",
+      "CVE": "2017",
+      "Description_Vuln": "Test Description",
+      "Suggest_Vuln": "Test Suggest",
+      "Reference_Vuln": "Tham chiếu",
+      "Name_Function": [
+        {
+          "name_func": "func 4",
+          "add_func": "http://github.com"
+        }
+      ],
+      "Request": "",
+      "Response": "",
+      "Image_Vuln": null
+    }
+  ]
+}
