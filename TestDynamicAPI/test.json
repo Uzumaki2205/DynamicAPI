@@ -44,11 +44,11 @@
       "Reference_Vuln": "Tham chiếu",
       "Name_Function": [
         {
-          "name_func": "func 1",
+          "name_func": "func 112",
           "add_func": "http://github.com"
         },
         {
-          "name_func": "func 1.1",
+          "name_func": "func 112.1",
           "add_func": "http://google.com"
         }
       ],
