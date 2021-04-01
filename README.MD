@@ -4,4 +4,4 @@
 - Table -> DONE
 - Chart -> UNDONE
 - Image -> UNDONE
-- Color -> DONE --> S
+- Color -> DONE
