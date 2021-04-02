@@ -25,56 +25,14 @@ namespace TestDynamicAPI
                 return value.ToString("yyyyMMddHHmmssffff");
             }
 
-            //public void LoadJson()
-            //{
-            //    infoObject = new List<Object>();
-            //    tableObject = new List<Object>();
-
-            //    Dictionary<string, string> obj_Property = new Dictionary<string, string>();
-            //    List<Dictionary<string, string>> obj_Array = new List<Dictionary<string, string>>();
-            //    List<Dictionary<string, string>> temp = new List<Dictionary<string, string>>(); // Xử lý bảng
-
-            //    File.Copy($"{rootPath}/test.docx", $"{rootPath}/testDocx.docx", true);
-
-            //    using (StreamReader r = new StreamReader($"{rootPath}/test.json"))
-            //    {
-            //        string json = r.ReadToEnd();
-            //        JObject jObject = JObject.Parse(json);
-
-            //        using (var doc = Configuration.Factory.Open("testDocx.docx"))
-            //        {
-            //            foreach (JProperty property in jObject.Properties())
-            //            {
-            //                foreach (var item in property)
-            //                {
-            //                    if (item.Type == JTokenType.String)
-            //                    {
-            //                        obj_Property.Add(property.Name, property.Value.ToString());
-            //                    }
-            //                    else if (item.Type == JTokenType.Array)
-            //                    {
-            //                        temp = ProcessTable(item, doc);
-
-            //                        infoObject.Add(obj_Property);
-
-            //                        doc.Process(infoObject);
-            //                        doc.Process(temp); //bảng
-            //                    }
-            //                }
-            //            }
-            //        }
-
-            //        Process.Start(new ProcessStartInfo("testDocx.docx") { UseShellExecute = true });
-            //    }
-            //}
-            object ImageLoader(object value, string metadata)
+            private object ImageLoader(object value, string metadata)
             {
                 //Plugin can be used to convert string into an Image type which Templater recognizes
                 if (metadata == "from-resource" && value is string)
                     return Image.FromFile(rootPath + $"/Static/{TimeStamp}/" + value.ToString());
                 return value;
             }
-            object ImageMaxSize(object value, string metadata)
+            private object ImageMaxSize(object value, string metadata)
             {
                 var bmp = value as Bitmap;
                 if (metadata.StartsWith("maxSize(") && bmp != null)
@@ -102,7 +60,7 @@ namespace TestDynamicAPI
                 List<Dictionary<string, string>> obj_Array = new List<Dictionary<string, string>>();
                 List<Dictionary<string, Object>> temp = new List<Dictionary<string, Object>>(); // Xử lý bảng
 
-                File.Copy($"{rootPath}/Report.docx", $"{rootPath}/testDocx.docx", true);
+                File.Copy($"{rootPath}/Report1.docx", $"{rootPath}/testDocx.docx", true);
 
                 var factory = Configuration.Builder
                 .Include(ImageLoader)   //setup image loading via from-resource metadata
@@ -124,6 +82,32 @@ namespace TestDynamicAPI
                                 {
                                     obj_Property.Add(property.Name, property.Value.ToString());
                                 }
+                                else if (item.Type == JTokenType.Object)
+                                {
+                                    if (property.Name.ToLower().Equals("chart"))
+                                    {
+                                        Dictionary<string, object>[] chart = new Dictionary<string, object>[4];
+                                        int i = 0;
+                                        foreach (JProperty itemChart in item)
+                                        {
+                                            chart[i] = new Dictionary<string, object>() { { "name", itemChart.Name }, { "value", itemChart.Value } };
+                                            i++;
+                                        }
+                                        doc.Process(new[] { new { pie = chart } });
+
+                                        //dynamic obj = new Dictionary<string, object>();
+                                        //foreach (JProperty itemChart in item)
+                                        //{
+                                        //    obj.Add(new Dictionary<string, object> { { "name", itemChart.Name }, { "value", itemChart.Value } });
+                                        //}
+
+                                        //doc.Process(new[] { new { pie = obj } });
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                }
                                 else if (item.Type == JTokenType.Array)
                                 {
                                     temp = ProcessTable(item);
@@ -135,6 +119,8 @@ namespace TestDynamicAPI
                                 }
                             }
                         }
+
+                        //doc.Process(new[] { new { pie = ProgressChart(2, 2, 2, 1) } });
                     }
 
                     DeleteFolderImage();
@@ -142,7 +128,7 @@ namespace TestDynamicAPI
                 }
             }
 
-            List<Dictionary<string, Object>> ProcessTable(JToken array)
+            private List<Dictionary<string, Object>> ProcessTable(JToken array)
             {
                 List<Dictionary<string, Object>> Dictionary_Looping = new List<Dictionary<string, Object>>();
 
@@ -169,13 +155,13 @@ namespace TestDynamicAPI
                                         if (subItemArray2p.Name.StartsWith("color-"))
                                         {
                                             Color color = new Color();
-                                            if (subItemArray2p.Value.ToString().ToLower().Equals("critical"))
+                                            if (subItemArray2p.Value.ToString().ToLower().Equals("critical") || subItemArray2p.Value.ToString().ToLower().Equals("nguy hiểm"))
                                                 color = Color.DeepPink;
-                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("high"))
+                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("high") || subItemArray2p.Value.ToString().ToLower().Equals("cao"))
                                                 color = Color.Red;
-                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("medium"))
+                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("medium") || subItemArray2p.Value.ToString().ToLower().Equals("trung bình"))
                                                 color = Color.Orange;
-                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("low"))
+                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("low") || subItemArray2p.Value.ToString().ToLower().Equals("thấp"))
                                                 color = Color.Yellow;
 
                                             array2p.Add("Color", color);
@@ -206,7 +192,18 @@ namespace TestDynamicAPI
                 return Dictionary_Looping;
             }
 
-            string ProcessImage(JProperty image)
+            //private Dictionary<string, object>[] ProgressChart(int critical, int high, int medium, int low)
+            //{
+            //    var pie1 = new Dictionary<string, object>[4];
+            //    pie1[0] = new Dictionary<string, object>() { { "name", "Critical" }, { "value", critical } };
+            //    pie1[1] = new Dictionary<string, object>() { { "name", "High" }, { "value", high } };
+            //    pie1[2] = new Dictionary<string, object>() { { "name", "Medium" }, { "value", medium } };
+            //    pie1[3] = new Dictionary<string, object>() { { "name", "Low" }, { "value", low } };
+
+            //    return pie1;
+            //}
+
+            private string ProcessImage(JProperty image)
             {
                 Random r = new Random();
                 string temp = r.Next(500).ToString();
@@ -230,6 +227,7 @@ namespace TestDynamicAPI
                 }
             }
 
+            //Delete Folder Image temp after insert into word
             private void DeleteFolderImage()
             {
                 DirectoryInfo dir = new DirectoryInfo($"{rootPath}Static/{TimeStamp}");
