@@ -94,18 +94,17 @@ namespace TestDynamicAPI
                                             i++;
                                         }
                                         doc.Process(new[] { new { pie = chart } });
-
-                                        //dynamic obj = new Dictionary<string, object>();
-                                        //foreach (JProperty itemChart in item)
-                                        //{
-                                        //    obj.Add(new Dictionary<string, object> { { "name", itemChart.Name }, { "value", itemChart.Value } });
-                                        //}
-
-                                        //doc.Process(new[] { new { pie = obj } });
                                     }
-                                    else
+                                    else // If into JObject have JArray
                                     {
-
+                                        foreach (var objArrayProperty in item)
+                                        {
+                                            foreach (var objArray in objArrayProperty)
+                                            {
+                                                temp = ProcessTable(objArray);
+                                            }
+                                        }
+                                        doc.Process(temp);
                                     }
                                 }
                                 else if (item.Type == JTokenType.Array)
@@ -119,8 +118,6 @@ namespace TestDynamicAPI
                                 }
                             }
                         }
-
-                        //doc.Process(new[] { new { pie = ProgressChart(2, 2, 2, 1) } });
                     }
 
                     DeleteFolderImage();
@@ -136,56 +133,88 @@ namespace TestDynamicAPI
                 {
                     // Dictionary <string -> Key, Object -> Can is String type or List<Dictionary<string, string>> Type>
                     Dictionary<string, Object> dic = new Dictionary<string, Object>();
+                    Dictionary<string, Object> dicObj = new Dictionary<string, Object>();
                     foreach (JProperty subItem in item)
                     {
-                        foreach (var tempArr in subItem)
+                        if (subItem.Parent.Type == JTokenType.Object)
                         {
-                            // If have array into array -> move array2 to List<string, string>
-                            // Then add List<string, string> to Dictionary<string, Dictionary<string,string>>
-                            if (tempArr.Type == JTokenType.Array)
+                            foreach (var arr2 in subItem)
                             {
-                                List<Dictionary<string, Object>> lstArr2 = new List<Dictionary<string, Object>>(); // List of array2 json
-                                foreach (JToken itemArray2p in tempArr)
+                                if(arr2.Type == JTokenType.Array)
                                 {
-                                    Dictionary<string, Object> array2p = new Dictionary<string, Object>();
-                                    foreach (JProperty subItemArray2p in itemArray2p)
+                                    List<Dictionary<string, Object>> lstArr2 = new List<Dictionary<string, Object>>(); // List of array2 json
+                                    foreach (var lstarray in arr2)
                                     {
-                                        array2p.Add(subItemArray2p.Name, subItemArray2p.Value.ToString());
-
-                                        if (subItemArray2p.Name.StartsWith("color-"))
+                                        Dictionary<string, Object> array2p = new Dictionary<string, Object>();
+                                        foreach (JProperty array2p2 in lstarray)
                                         {
-                                            Color color = new Color();
-                                            if (subItemArray2p.Value.ToString().ToLower().Equals("critical") || subItemArray2p.Value.ToString().ToLower().Equals("nguy hiểm"))
-                                                color = Color.DeepPink;
-                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("high") || subItemArray2p.Value.ToString().ToLower().Equals("cao"))
-                                                color = Color.Red;
-                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("medium") || subItemArray2p.Value.ToString().ToLower().Equals("trung bình"))
-                                                color = Color.Orange;
-                                            else if (subItemArray2p.Value.ToString().ToLower().Equals("low") || subItemArray2p.Value.ToString().ToLower().Equals("thấp"))
-                                                color = Color.Yellow;
+                                            if (array2p2.Name.StartsWith("color-"))
+                                                array2p.Add("Color", ProcessColor(array2p2));
 
-                                            array2p.Add("Color", color);
+                                            array2p.Add(array2p2.Name, array2p2.Value.ToString());
                                         }
+                                        lstArr2.Add(array2p);
                                     }
-                                    // Create List Dictionary of array into array :)))
-                                    lstArr2.Add(array2p);
-                                }
-                                dic.Add(subItem.Name, lstArr2);
-                            }
-                            else
-                            {
-                                if (subItem.Name.StartsWith("image-"))
-                                {
-                                    string valueImage = ProcessImage(subItem);
-                                    dic.Add(subItem.Name, valueImage + ".jpg");
+                                    dic.Add(subItem.Name, lstArr2);
                                 }
                                 else
                                 {
-                                    dic.Add(subItem.Name, subItem.Value.ToString()); 
+                                    if (subItem.Name.StartsWith("color-"))
+                                        dicObj.Add("Color", ProcessColor(subItem));
+
+                                    if (subItem.Name.StartsWith("image-"))
+                                    {
+                                        string valueImage = ProcessImage(subItem);
+                                        dicObj.Add(subItem.Name, valueImage + ".jpg");
+                                    }
+                                    else dicObj.Add(subItem.Name, subItem.Value.ToString());
                                 }
                             }
                         }
+                        //else if (subItem.Type == JTokenType.Array)
+                        //{
+                        //    foreach (var tempArr in subItem)
+                        //    {
+                        //        // If have array into array -> move array2 to List<string, string>
+                        //        // Then add List<string, string> to Dictionary<string, Dictionary<string,string>>
+                        //        if (tempArr.Type == JTokenType.Array)
+                        //        {
+                        //            List<Dictionary<string, Object>> lstArr2 = new List<Dictionary<string, Object>>(); // List of array2 json
+                        //            foreach (JToken itemArray2p in tempArr)
+                        //            {
+                        //                Dictionary<string, Object> array2p = new Dictionary<string, Object>();
+                        //                foreach (JProperty subItemArray2p in itemArray2p)
+                        //                {
+                        //                    array2p.Add(subItemArray2p.Name, subItemArray2p.Value.ToString());
+
+                        //                    if (subItemArray2p.Name.StartsWith("color-"))
+                        //                    {
+                        //                        array2p.Add("Color", ProcessColor(subItemArray2p));
+                        //                    }   
+                        //                }
+                        //                // Create List Dictionary of array into array :)))
+                        //                lstArr2.Add(array2p);
+                        //            }
+                        //            dic.Add(subItem.Name, lstArr2);
+                        //        }
+                        //        else
+                        //        {
+                        //            if (subItem.Name.StartsWith("image-"))
+                        //            {
+                        //                string valueImage = ProcessImage(subItem);
+                        //                dic.Add(subItem.Name, valueImage + ".jpg");
+                        //            }
+                        //            else
+                        //            {
+                        //                dic.Add(subItem.Name, subItem.Value.ToString());
+                        //            }
+                        //        }
+                        //    }
+                        //}
+                        
                     }
+
+                    dic.Add(array.Path, dicObj);
                     Dictionary_Looping.Add(dic);
                 }
 
@@ -202,6 +231,22 @@ namespace TestDynamicAPI
 
             //    return pie1;
             //}
+
+            private Color ProcessColor(JProperty property)
+            {
+                Color color = Color.Transparent;
+               
+                if (property.Value.ToString().ToLower().Equals("critical") || property.Value.ToString().ToLower().Equals("nguy hiểm"))
+                    color = Color.DeepPink;
+                else if (property.Value.ToString().ToLower().Equals("high") || property.Value.ToString().ToLower().Equals("cao"))
+                    color = Color.Red;
+                else if (property.Value.ToString().ToLower().Equals("medium") || property.Value.ToString().ToLower().Equals("trung bình"))
+                    color = Color.Orange;
+                else if (property.Value.ToString().ToLower().Equals("low") || property.Value.ToString().ToLower().Equals("thấp"))
+                    color = Color.Yellow;
+ 
+                return color;
+            }
 
             private string ProcessImage(JProperty image)
             {
